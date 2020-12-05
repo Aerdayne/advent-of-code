@@ -6,7 +6,7 @@ RES=$(($RES + 1))
 
 if [ $RES -lt 10 ]
 then
-  RES="0$(($RES + 1))"
+  RES="0$(($RES))"
 fi
 
 mkdir "$RES"
