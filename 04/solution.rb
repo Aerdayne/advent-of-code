@@ -12,8 +12,8 @@ class Solution
     'hcl' => ->(v) { (v =~ /^\#([0-9]|[a-f]){6}$/)&.zero? },
     'ecl' => ->(v) { %w[amb blu brn gry grn hzl oth].include?(v) },
     'pid' => ->(v) { (v =~ /^\d{7}(?:\d{2})?$/)&.zero? }
-
   }.freeze
+
   class << self
     def solve
       id = 0
