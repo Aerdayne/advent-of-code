@@ -8,17 +8,18 @@ PROBLEM_DIR_PATH = "#{__dir__}/../../#{YEAR}/ruby/#{DAY}"
 PROBLEM_FILE_PATH = File.absolute_path(File.join(PROBLEM_DIR_PATH, 'solution.rb'))
 raise ArgumentError, "No solution found for day #{DAY} of the year #{YEAR}" unless File.exist?(PROBLEM_FILE_PATH)
 
+require 'set'
+require 'ostruct'
+
 module Utils
   class Input
     class << self
-      def parse(result, filename = 'input.txt', &block)
+      def parse(filename: 'input.txt', &block)
         file = File.expand_path(filename, PROBLEM_DIR_PATH)
-        return File.foreach(file) unless block_given?
+        enumerator = File.foreach(file).with_index
+        return enumerator unless block_given?
 
-        File.foreach(file).with_object(result) do |(line, index), accum|
-          block.call(accum, line, index)
-        end
-        result
+        enumerator.each { |*args| block.call(args) }
       end
     end
   end
@@ -28,10 +29,10 @@ require PROBLEM_FILE_PATH
 
 case PART
 when '1'
-  Part1.new.solve
+  p Part1.new.solve
 when '2'
-  Part2.new.solve
+  p Part2.new.solve
 else
-  Part1.new.solve
-  Part2.new.solve
+  puts "Part 1: #{Part1.new.solve}"
+  puts "Part 2: #{Part2.new.solve}"
 end

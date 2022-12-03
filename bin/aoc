@@ -73,7 +73,7 @@ module CLI
       end
 
       def execute(options)
-        exec("/usr/bin/time #{SUPPORTED_LANGUAGES[options[:l]][:entrypoint]} #{options[:y]} #{options[:d]} #{options[:p]}")
+        exec("#{SUPPORTED_LANGUAGES[options[:l]][:entrypoint]} #{options[:y]} #{options[:d]} #{options[:p]}")
       end
     end
   end
