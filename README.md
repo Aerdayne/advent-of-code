@@ -2,8 +2,22 @@
 
 A repository with my [Advent of Code](https://adventofcode.com/) solutions.
 
-Some of them are written with speed and performance in mind (<i>I wish</i>), others are written in Ruby.
+## Using the CLI
 
-The initial plan was to switch languages every day in order to get out of the comfort zone and learn new things, thus if you see `Ruby >90%` in the 'Languages' tab to the right it means that I have successfully failed in this endeavour.
+In order to bootstrap a new solution, use `aoc new`:
 
-Almost all of the solutions were revisited and polished after the submission, but the <b>algorithms themselves remain true to their original versions</b> that I have come up with at 7 AM. Some of them are not optimal and for some no second thought was given (<i>cough</i> binary in day 5 <i>cough</i>).
+```shell
+aoc new -y YEAR -d DAY -l LANGUAGE [-p PART]
+```
+
+> Use `aoc new -h` to get an overview of available arguments.
+
+> In order to run it without `direnv` installed (or without allowing `envrc`), replace `aoc` with `./bin/aoc`.
+
+To run a particular solution, use `aoc run`:
+
+```shell
+aoc run -y YEAR -d DAY -l LANGUAGE
+```
+
+> Use `aoc run -h` to get an overview of available arguments.

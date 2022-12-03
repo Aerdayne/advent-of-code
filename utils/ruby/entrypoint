@@ -1,0 +1,37 @@
+#!/usr/bin/env ruby
+
+YEAR = ARGV[0]
+DAY = ARGV[1]
+PART = ARGV[2]
+
+PROBLEM_DIR_PATH = "#{__dir__}/../../#{YEAR}/ruby/#{DAY}"
+PROBLEM_FILE_PATH = File.absolute_path(File.join(PROBLEM_DIR_PATH, 'solution.rb'))
+raise ArgumentError, "No solution found for day #{DAY} of the year #{YEAR}" unless File.exist?(PROBLEM_FILE_PATH)
+
+module Utils
+  class Input
+    class << self
+      def parse(result, filename = 'input.txt', &block)
+        file = File.expand_path(filename, PROBLEM_DIR_PATH)
+        return File.foreach(file) unless block_given?
+
+        File.foreach(file).with_object(result) do |(line, index), accum|
+          block.call(accum, line, index)
+        end
+        result
+      end
+    end
+  end
+end
+
+require PROBLEM_FILE_PATH
+
+case PART
+when '1'
+  Part1.new.solve
+when '2'
+  Part2.new.solve
+else
+  Part1.new.solve
+  Part2.new.solve
+end

@@ -1,0 +1,133 @@
+#!/usr/bin/env ruby
+
+require 'optparse'
+require 'fileutils'
+require 'date'
+
+raise ArgumentError, 'Available commands are `run` and `new`.' unless %w[run new].include?(ARGV.first)
+
+SUPPORTED_LANGUAGES = {
+  ruby: {
+    entrypoint: 'utils/ruby/entrypoint',
+    template: 'utils/ruby/template.rb',
+    solution_filename: 'solution.rb'
+  }
+}
+
+ARGUMENT_VALIDATORS = {
+  year: ->(year) do
+    raise OptionParser::InvalidArgument.new('Year is invalid') unless Date.new(year.to_i).gregorian?
+  end,
+  day: ->(day) do
+    raise OptionParser::InvalidArgument.new('Day is invalid') unless (1..31).include?(day.to_i)
+  end,
+  language: ->(language) do
+    raise OptionParser::InvalidArgument.new('Language is not supported') unless SUPPORTED_LANGUAGES.keys.include?(language.to_sym)
+  end,
+  part: ->(part) do
+    raise OptionParser::InvalidArgument.new('There are only 2 parts to each problem') unless [1, 2].include?(part.to_i)
+  end
+}
+
+module CLI
+  class Run
+    class << self
+      def call
+        options = parse_options
+        execute(options)
+      end
+
+      def parse_options
+        options = {}
+
+        OptionParser.new do |parser|
+          parser.banner = 'Usage: aoc run -y YEAR -d DAY -l LANGUAGE [-p PART]'
+          parser.on('-h', '--help', 'Prints this help') do
+            puts parser
+            exit
+          end
+
+          parser.on('-y', '--year YEAR', 'Specify year') do |year|
+            ARGUMENT_VALIDATORS[:year].call(year)
+            options[:y] = year
+          end
+          parser.on('-d', '--day DAY', 'Specify day') do |day|
+            ARGUMENT_VALIDATORS[:day].call(day)
+            options[:d] = day.rjust(2, '0')
+          end
+          parser.on('-l', '--language LANGUAGE', 'Specify language') do |language|
+            ARGUMENT_VALIDATORS[:language].call(language)
+            options[:l] = language.to_sym
+          end
+          parser.on('-p', '--part PART', 'Optionally specify which part to run') do |part|
+            ARGUMENT_VALIDATORS[:part].call(part)
+            options[:p] = part
+          end
+        end.parse!
+
+        [:y, :d, :l].each do |arg|
+          raise OptionParser::MissingArgument.new(arg) if options[arg].nil?
+        end
+
+        options
+      end
+
+      def execute(options)
+        exec("/usr/bin/time #{SUPPORTED_LANGUAGES[options[:l]][:entrypoint]} #{options[:y]} #{options[:d]} #{options[:p]}")
+      end
+    end
+  end
+
+  class New
+    class << self
+      def call
+        options = parse_options
+        execute(options)
+      end
+
+      def parse_options
+        options = {}
+
+        OptionParser.new do |parser|
+          parser.banner = 'Usage: aoc new -y YEAR -d DAY -l LANGUAGE'
+          parser.on('-h', '--help', 'Prints this help') { puts parser; exit }
+
+          parser.on('-y', '--year YEAR', 'Specify year') do |year|
+            ARGUMENT_VALIDATORS[:year].call(year)
+            options[:y] = year
+          end
+          parser.on('-d', '--day DAY', 'Specify day') do |day|
+            ARGUMENT_VALIDATORS[:day].call(day)
+            options[:d] = day.rjust(2, '0')
+          end
+          parser.on('-l', '--language LANGUAGE', 'Specify language') do |language|
+            ARGUMENT_VALIDATORS[:language].call(language)
+            options[:l] = language.to_sym
+          end
+        end.parse!
+
+        [:y, :d, :l].each do |arg|
+          raise OptionParser::MissingArgument.new(arg) if options[arg].nil?
+        end
+
+        options
+      end
+
+      def execute(options)
+        directory_path = "#{__dir__}/../#{options[:y]}/#{options[:l]}/#{options[:d]}"
+        FileUtils.mkdir_p(directory_path)
+
+        file_path = File.join(directory_path, File.basename(SUPPORTED_LANGUAGES[options[:l]][:solution_filename]))
+        FileUtils.cp(SUPPORTED_LANGUAGES[options[:l]][:template], file_path) unless File.exist?(file_path)
+        FileUtils.touch(File.join(directory_path, File.basename('input.txt')))
+      end
+    end
+  end
+end
+
+case ARGV.first
+when 'run'
+  CLI::Run.call
+when 'new'
+  CLI::New.call
+end
