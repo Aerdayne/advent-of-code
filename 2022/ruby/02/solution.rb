@@ -6,7 +6,10 @@ OUTCOMES = {
 
 class Part1
   def solve
-    Utils::Input.parse.inject(0) { |acc, (row, _)| acc + OUTCOMES[row[2]][row[0]] + row[2].ord % 87 }
+    Utils::Input.parse.inject(0) do |acc, (row)|
+      opponent_move, player_move = row.chomp.split
+      acc + OUTCOMES[player_move][opponent_move] + player_move.ord % 'W'.ord
+    end
   end
 end
 
@@ -18,8 +21,10 @@ MOVES = {
 
 class Part2
   def solve
-    Utils::Input.parse.inject(0) do |acc, (row, _)|
-      acc + OUTCOMES[MOVES[row[2]][row[0]]][row[0]] + MOVES[row[2]][row[0]].ord % 87
+    Utils::Input.parse.inject(0) do |acc, (row)|
+      opponent_move, player_move = row.chomp.split
+      required_move = MOVES[player_move][opponent_move]
+      acc + OUTCOMES[required_move][opponent_move] + required_move.ord % 'W'.ord
     end
   end
 end

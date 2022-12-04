@@ -3,6 +3,7 @@
 require 'optparse'
 require 'fileutils'
 require 'date'
+require 'debug'
 
 raise ArgumentError, 'Available commands are `run` and `new`.' unless %w[run new].include?(ARGV.first)
 
@@ -42,10 +43,7 @@ module CLI
 
         OptionParser.new do |parser|
           parser.banner = 'Usage: aoc run -y YEAR -d DAY -l LANGUAGE [-p PART]'
-          parser.on('-h', '--help', 'Prints this help') do
-            puts parser
-            exit
-          end
+          parser.on('-h', '--help', 'Prints this help') { puts parser; exit }
 
           parser.on('-y', '--year YEAR', 'Specify year') do |year|
             ARGUMENT_VALIDATORS[:year].call(year)
