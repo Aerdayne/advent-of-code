@@ -14,9 +14,10 @@ require 'ostruct'
 module Utils
   class Input
     class << self
-      def parse(filename: 'input.txt', &block)
+      def parse(filename: 'input.txt', with_index: true, &block)
         file = File.expand_path(filename, PROBLEM_DIR_PATH)
-        enumerator = File.foreach(file).with_index
+        enumerator = File.foreach(file)
+        enumerator = enumerator.with_index if with_index
         return enumerator unless block_given?
 
         enumerator.each { |*args| block.call(args) }
