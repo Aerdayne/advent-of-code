@@ -1,8 +1,12 @@
 #!/usr/bin/env ruby
 
+convert_null = -> value { value == 'NULL' ? nil : value }
+
 YEAR = ARGV[0]
 DAY = ARGV[1]
-PART = ARGV[2]
+
+PART = convert_null[ARGV[2]]
+BENCHMARK = convert_null[ARGV[3]]
 
 PROBLEM_DIR_PATH = "#{__dir__}/../../#{YEAR}/ruby/#{DAY}"
 PROBLEM_FILE_PATH = File.absolute_path(File.join(PROBLEM_DIR_PATH, 'solution.rb'))
@@ -10,13 +14,23 @@ raise ArgumentError, "No solution found for day #{DAY} of the year #{YEAR}" unle
 
 require 'set'
 require 'ostruct'
+require 'benchmark'
+
+require 'bundler/inline'
+
+gemfile {
+  source 'https://rubygems.org'
+  gem 'benchmark-memory'
+}
+
+require 'benchmark/memory'
 
 module Utils
   class Input
     class << self
       def parse(filename: 'input.txt', with_index: true, &block)
         file = File.expand_path(filename, PROBLEM_DIR_PATH)
-        enumerator = File.foreach(file)
+        enumerator = File.foreach(file, chomp: true)
         enumerator = enumerator.with_index if with_index
         return enumerator unless block_given?
 
@@ -28,12 +42,41 @@ end
 
 require PROBLEM_FILE_PATH
 
-case PART
-when '1'
-  p Part1.new.solve
-when '2'
-  p Part2.new.solve
-else
-  puts "Part 1: #{Part1.new.solve}"
-  puts "Part 2: #{Part2.new.solve}"
-end
+run_solution = -> part {
+  case part
+  in 1
+    Part1.new.solve
+  in 2
+    Part2.new.solve
+  end
+}
+
+run_without_benchmarks = -> run, parts {
+  parts.each do |part|
+    puts "Part #{part} -> #{run[part]}"
+  end
+}
+
+optionally_benchmark = -> run {
+  return run_without_benchmarks.curry[run] if BENCHMARK != 'true'
+
+  -> parts {
+    puts "Time:\n"
+    Benchmark.bmbm do |benchmark|
+      parts.each do |part|
+        benchmark.report("Part #{part}") { run[part] }
+      end
+    end
+
+    puts "\nMemory:\n"
+    Benchmark.memory do |benchmark|
+      parts.each do |part|
+        benchmark.report("Part #{part}") { run[part] }
+      end
+      benchmark.compare!
+    end
+  }
+}
+
+parts = PART.nil? ? [1, 2] : [PART.to_i]
+optionally_benchmark[run_solution][parts]

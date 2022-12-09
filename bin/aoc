@@ -61,6 +61,9 @@ module CLI
             ARGUMENT_VALIDATORS[:part].call(part)
             options[:p] = part
           end
+          parser.on('-b', '--benchmark', 'Optionally run a benchmark') do |value|
+            options[:b] = value
+          end
         end.parse!
 
         [:y, :d, :l].each do |arg|
@@ -71,7 +74,14 @@ module CLI
       end
 
       def execute(options)
-        exec("#{SUPPORTED_LANGUAGES[options[:l]][:entrypoint]} #{options[:y]} #{options[:d]} #{options[:p]}")
+        exec(<<~HEREDOC
+          #{SUPPORTED_LANGUAGES[options[:l]][:entrypoint]} \
+          #{options[:y]} \
+          #{options[:d]} \
+          #{options[:p] || 'NULL'} \
+          #{options[:b] || 'NULL'}
+        HEREDOC
+        )
       end
     end
   end
