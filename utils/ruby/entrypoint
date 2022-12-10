@@ -34,7 +34,7 @@ module Utils
         enumerator = enumerator.with_index if with_index
         return enumerator unless block_given?
 
-        enumerator.each { |*args| block.call(args) }
+        enumerator.each { |*args| block.call(*args) }
       end
     end
   end
@@ -53,7 +53,16 @@ run_solution = -> part {
 
 run_without_benchmarks = -> run, parts {
   parts.each do |part|
-    puts "Part #{part} -> #{run[part]}"
+    return_value = run[part]
+    case return_value
+    in Array => array
+      puts "Part #{part} ->"
+      array.each do |row|
+        p row
+      end
+    else
+      puts "Part #{part} -> #{return_value}"
+    end
   end
 }
 
