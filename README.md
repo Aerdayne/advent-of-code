@@ -7,7 +7,7 @@ A repository with my [Advent of Code](https://adventofcode.com/) solutions.
 In order to bootstrap a new solution, use `aoc new`:
 
 ```shell
-aoc new --year YEAR --day DAY --language LANGUAGE [--part PART] [--benchmark]
+aoc new --year YEAR --day DAY --language LANGUAGE
 ```
 
 > Use `aoc new -h` to get an overview of available arguments.
@@ -17,7 +17,7 @@ aoc new --year YEAR --day DAY --language LANGUAGE [--part PART] [--benchmark]
 To run a particular solution, use `aoc run`:
 
 ```shell
-aoc run --year YEAR --day DAY --language LANGUAGE
+aoc run --year YEAR --day DAY --language LANGUAGE [--part PART] [--benchmark]
 ```
 
 > Use `aoc run -h` to get an overview of available arguments.
